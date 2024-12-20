@@ -66,7 +66,7 @@ class Snake(Board):
     def update(self):
         self.render()
         if self.do:
-            last = (self.body[-1][0], self.body[-1][1])
+            last = (self.body[0][0], self.body[0][1])
             self.body[2] = (self.body[2][0], self.body[2][1], self.direction)
             for i in range(len(self.body)):
                 x = self.body[i][0] + self.body[i][2][0]
@@ -76,8 +76,8 @@ class Snake(Board):
                 else:
                     d = self.body[i + 1][2]
                 self.body[i] = (x, y, d)
-            self.board[self.body[0][0]][self.body[0][1]] = 1
-            if (self.body[0][1], self.body[0][2]) != self.apple:
+            self.board[self.body[-1][0]][self.body[-1][1]] = 1
+            if (self.body[-1][0], self.body[-1][1]) != self.apple:
                 self.board[last[0]][last[1]] = 0
             else:
                 t = [(i[0], i[1]) for i in self.body]
@@ -87,9 +87,13 @@ class Snake(Board):
                 self.board[self.apple[0]][self.apple[1]] = 2
                 self.body.append((last[0], last[1], self.body[1][2]))
                 self.ate += 1
-            pass  # Нет проверки на столкновение
+            pass  # Нет проверки на столкновение, я хз что не работает
 
     def end(self):
+        """
+        Возвращает количество съеденных яблок
+        :return:
+        """
         return self.ate
 
 
