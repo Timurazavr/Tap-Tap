@@ -1,6 +1,7 @@
 import random
 
 import pygame
+from pygame.display import update
 
 
 class Board:
@@ -64,10 +65,9 @@ class Snake(Board):
             self.do = True
 
     def update(self):
-        self.render()
         if self.do:
             last = (self.body[0][0], self.body[0][1])
-            self.body[2] = (self.body[2][0], self.body[2][1], self.direction)
+            self.body[-1] = (self.body[-1][0], self.body[-1][1], self.direction)
             for i in range(len(self.body)):
                 x = self.body[i][0] + self.body[i][2][0]
                 y = self.body[i][1] + self.body[i][2][1]
@@ -81,13 +81,16 @@ class Snake(Board):
                 self.board[last[0]][last[1]] = 0
             else:
                 t = [(i[0], i[1]) for i in self.body]
-                self.apple = (random.randint(0, 15), random.randint(0, 17))
-                while self.apple == t:
-                    self.apple = (random.randint(0, 15), random.randint(0, 17))
+                self.apple = (random.randint(0, 14), random.randint(0, 16))
+                while t.__contains__(self.apple):
+                    self.apple = (random.randint(0, 14), random.randint(0, 16))
                 self.board[self.apple[0]][self.apple[1]] = 2
+                self.body.reverse()
                 self.body.append((last[0], last[1], self.body[1][2]))
+                self.body.reverse()
                 self.ate += 1
-            pass  # Нет проверки на столкновение, я хз что не работает
+            pass  # Неубиваем(вызывает end() при смерти), не стирает за собой
+        self.render()
 
     def end(self):
         """
@@ -110,5 +113,8 @@ if __name__ == '__main__':
                 run = False
             if event.type == pygame.KEYDOWN:
                 snake.change_direction(event)
-        snake.update()
-        pygame.time.Clock().tick(3)
+        a = snake.update()
+        if a == int:
+            run = False
+            print(a)
+        pygame.time.Clock().tick(5)
