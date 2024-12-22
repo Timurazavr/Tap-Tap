@@ -1,7 +1,5 @@
 import random
-
 import pygame
-from pygame.display import update
 
 
 class Board:
@@ -39,7 +37,7 @@ class Board:
 class Snake(Board):
     def __init__(self, screen, w=17, h=15):
         super().__init__(screen, w, h)
-        self.body = [(7, 1, (1, 0)), (7, 2, (1, 0)), (7, 3, (0, 0))]
+        self.body = [(7, 1, (0, 1)), (7, 2, (0, 1)), (7, 3, (0, 1))]
         self.ate = 0
         self.direction = (1, 0)
         self.render()
@@ -49,24 +47,39 @@ class Snake(Board):
         self.apple = (7, 11)
         self.board[7][11] = 2
         self.do = False
+        self.wait = False
 
     def change_direction(self, event):
-        if event.key == pygame.K_UP and self.direction != (1, 0):
-            self.direction = (-1, 0)
-            self.do = True
-        elif event.key == pygame.K_DOWN and self.direction != (-1, 0):
-            self.direction = (1, 0)
-            self.do = True
-        elif event.key == pygame.K_LEFT and self.direction != (0, 1):
-            self.direction = (0, -1)
-            self.do = True
-        elif event.key == pygame.K_RIGHT and self.direction != (0, -1):
-            self.direction = (0, 1)
-            self.do = True
+        if not self.wait:
+            if event.key == pygame.K_UP and self.direction != (1, 0):
+                self.direction = (-1, 0)
+                self.do = True
+                self.wait = True
+            elif event.key == pygame.K_DOWN and self.direction != (-1, 0):
+                self.direction = (1, 0)
+                self.do = True
+                self.wait = True
+            elif event.key == pygame.K_LEFT and self.direction != (0, 1):
+                self.direction = (0, -1)
+                self.do = True
+                self.wait = True
+            elif event.key == pygame.K_RIGHT and self.direction != (0, -1):
+                self.direction = (0, 1)
+                self.do = True
+                self.wait = True
+
+    def set_board(self):
+        for y in range(len(self.board)):
+            for x in range(len(self.board[0])):
+                self.board[y][x] = 0
+        for i in self.body:
+            self.board[i[0]][i[1]] = 1
+        self.board[self.apple[0]][self.apple[1]] = 2
 
     def update(self):
         if self.do:
             last = (self.body[0][0], self.body[0][1])
+            g = self.body[0][2]
             self.body[-1] = (self.body[-1][0], self.body[-1][1], self.direction)
             for i in range(len(self.body)):
                 x = self.body[i][0] + self.body[i][2][0]
@@ -76,21 +89,18 @@ class Snake(Board):
                 else:
                     d = self.body[i + 1][2]
                 self.body[i] = (x, y, d)
-            self.board[self.body[-1][0]][self.body[-1][1]] = 1
-            if (self.body[-1][0], self.body[-1][1]) != self.apple:
-                self.board[last[0]][last[1]] = 0
-            else:
+            if (self.body[-1][0], self.body[-1][1]) == self.apple:
                 t = [(i[0], i[1]) for i in self.body]
-                self.apple = (random.randint(0, 14), random.randint(0, 16))
+                self.apple = (random.randint(0, self.height - 1), random.randint(0, self.width - 1))
                 while t.__contains__(self.apple):
-                    self.apple = (random.randint(0, 14), random.randint(0, 16))
-                self.board[self.apple[0]][self.apple[1]] = 2
+                    self.apple = (random.randint(0, self.height - 1), random.randint(0, self.width - 1))
                 self.body.reverse()
-                self.body.append((last[0], last[1], self.body[1][2]))
+                self.body.append((last[0], last[1], g))
                 self.body.reverse()
                 self.ate += 1
-            pass  # Неубиваем(вызывает end() при смерти), не стирает за собой
-        self.render()
+            self.set_board()
+            self.wait = False
+        self.render()  # Неубиваем(вызывает end() при смерти), баг неедабельная еда
 
     def end(self):
         """
