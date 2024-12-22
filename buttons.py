@@ -49,6 +49,3 @@ class StartButton(pygame.sprite.Sprite):
             self.rect.centery = self.y
             if self.counterx == -20 or self.counterx == 0:
                 self.flag = not self.flag
-
-    def call_back(self):
-        print(0)
