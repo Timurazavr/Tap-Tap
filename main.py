@@ -24,7 +24,7 @@ if __name__ == "__main__":
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit()
-            elif event.type == pygame.MOUSEBUTTONDOWN:
+            elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     if start_button.rect.collidepoint(*event.pos):
                         game_menu.main(screen, clock, width, height, FPS)

@@ -1,6 +1,40 @@
 import pygame
 
 
+class Button(pygame.sprite.Sprite):
+
+    def __init__(
+        self, x, y, width=None, height=None, color=None, text=None, image=None
+    ):
+        super().__init__()
+        if image is None:
+            self.image = pygame.Surface((width, height))
+            self.image.fill("white")
+            pygame.draw.circle(
+                self.image, color, (height // 2, height // 2), height // 2
+            )
+            pygame.draw.rect(
+                self.image,
+                color,
+                (height // 2, 0, width - height, height),
+            )
+            pygame.draw.circle(
+                self.image, color, (width - height // 2, height // 2), height // 2
+            )
+            self.color = color
+        else:
+            self.image = image
+        if text:
+            txt = pygame.font.SysFont("arial", 16).render(text, True, "black")
+            self.image.blit(txt, (width // 2, height // 2))
+            self.text = text
+        self.rect = self.image.get_rect()
+        self.rect.topleft = x, y
+
+    def click(self):
+        print("click", self.__class__.__name__)
+
+
 class StartButton(pygame.sprite.Sprite):
 
     def __init__(self, x, y, width, height, color, text):
