@@ -1,5 +1,7 @@
 import pygame
 from multipledispatch import dispatch
+from typing import overload
+
 
 class StartButton(pygame.sprite.Sprite):
     def __init__(self, x: int, y: int):
@@ -39,8 +41,7 @@ class StartButton(pygame.sprite.Sprite):
         self.image.set_colorkey("white")
 
         self.rect = self.image.get_rect()
-        self.rect.centerx = self.x
-        self.rect.centery = self.y
+        self.rect.center = self.x, self.y
 
     def update(self):
         if not self.collidepoint(*pygame.mouse.get_pos()):
@@ -64,34 +65,48 @@ class StartButton(pygame.sprite.Sprite):
 
 
 class Button(pygame.sprite.Sprite):
+    @dispatch(int, int, int, int, str, str, str, int)
     def __init__(
-        self, x, y, width=None, height=None, color=None, text=None, image=None
+        self,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        color: str,
+        text: str,
+        name_font: str,
+        font_size: int,
     ):
         super().__init__()
-        if image is None:
-            self.image = pygame.Surface((width, height))
-            self.image.fill("white")
-            pygame.draw.circle(
-                self.image, color, (height // 2, height // 2), height // 2
-            )
-            pygame.draw.rect(
-                self.image,
-                color,
-                (height // 2, 0, width - height, height),
-            )
-            pygame.draw.circle(
-                self.image, color, (width - height // 2, height // 2), height // 2
-            )
-            self.color = color
-        else:
-            self.image = image
-        if text:
-            txt = pygame.font.SysFont("arial", 16).render(text, True, "black")
-            self.image.blit(txt, (width // 2, height // 2))
-            self.text = text
+        self.image = pygame.Surface((width, height))
+        self.image.fill("white")
+        pygame.draw.circle(self.image, color, (height // 2, height // 2), height // 2)
+        pygame.draw.rect(
+            self.image,
+            color,
+            (height // 2, 0, width - height, height),
+        )
+        pygame.draw.circle(
+            self.image, color, (width - height // 2, height // 2), height // 2
+        )
+
+        font = pygame.font.SysFont(name_font, font_size).render(text, True, "black")
+        self.image.blit(
+            font,
+            (width // 2 - font.get_width() // 2, height // 2 - font.get_height() // 2),
+        )
+        self.text = text
         self.rect = self.image.get_rect()
-        self.rect.topleft = x, y
+        self.rect.center = x, y
+
         self.image.set_colorkey("white")
+
+    @dispatch(int, int, pygame.Surface)
+    def __init__(self, x: int, y: int, image: pygame.Surface):
+        super().__init__()
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.center = x, y
 
     def click(self):
         print("click", self.__class__.__name__)
