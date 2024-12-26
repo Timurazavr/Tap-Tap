@@ -1,4 +1,5 @@
 import json
+from time import perf_counter
 
 
 def write(key, value, add_or_write="write"):
@@ -16,3 +17,4 @@ def read(key):
     with open("db.json") as f:
         sl = json.load(f)
     return sl.get(key, None)
+

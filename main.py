@@ -23,10 +23,11 @@ if __name__ == "__main__":
         clock.tick(FPS)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                pygame.quit()
                 quit()
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
-                    if start_button.rect.collidepoint(*event.pos):
+                    if start_button.collide(*event.pos):
                         game_menu.main(screen, clock, width, height, FPS)
         all_sprites.update()
 
