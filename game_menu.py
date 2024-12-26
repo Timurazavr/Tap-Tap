@@ -1,7 +1,9 @@
 import pygame
 from buttons import Button
-from classes import Character, Mini_game_btn
+from classes import Character
 import db
+import Snake
+import Piu_Piu
 
 
 def main(
@@ -13,10 +15,18 @@ def main(
     all_sprites.add(character)
     down_btn = Button(250, 800, 400, 100, "red", "Назад", "arial", 36)
     all_sprites.add(down_btn)
-    all_sprites.add(Mini_game_btn(1200, 500))
+    snake = Button(1150, 350, pygame.image.load("snake.png"))
+    all_sprites.add(snake)
+    snake.click = Snake.main
+    piu_piu = Button(
+        1150, 500, pygame.transform.scale(pygame.image.load("ship.png"), (92, 92))
+    )
+    all_sprites.add(piu_piu)
+    piu_piu.click = Piu_Piu.main
 
     counter_cash = db.read("cash")
     cash_font = pygame.font.SysFont("Arial", 48)
+    game_font = pygame.font.SysFont("Arial", 56)
 
     counter_bg = -1
     index_coin = 1
@@ -39,6 +49,12 @@ def main(
                     elif down_btn.collide(*event.pos):
                         db.write("cash", counter_cash, "write")
                         running = False
+                    elif snake.collide(*event.pos):
+                        counter_cash += (
+                            snake.click(screen, clock, width, height, FPS) * 3
+                        )
+                    elif piu_piu.collide(*event.pos):
+                        counter_cash += piu_piu.click(screen, clock, width, height, FPS)
 
         all_sprites.update()
 
@@ -59,6 +75,10 @@ def main(
         screen.blit(
             surface_coin,
             (width - 260 - surface_cash.width - surface_coin.width // 2, 25),
+        )
+        screen.blit(
+            game_font.render("Мини-игры:", True, "white"),
+            (1050, 200),
         )
 
         all_sprites.draw(screen)

@@ -108,13 +108,9 @@ class Button(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = x, y
 
-    def click(self):
-        print("click", self.__class__.__name__)
-
     def collide(self, x, y):
         leftx, topy = self.rect.topleft
         try:
-            print(self.image.get_at((x - leftx, y - topy)))
             if self.rect.collidepoint(x, y) and self.image.get_at(
                 (x - leftx, y - topy)
             ) != (255, 255, 255, 255):

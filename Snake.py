@@ -53,19 +53,19 @@ class Snake(Board):
 
     def change_direction(self, event):
         if not self.wait:
-            if event.key == pygame.K_UP and self.direction != (1, 0):
+            if event.key == pygame.K_w and self.direction != (1, 0):
                 self.direction = (-1, 0)
                 self.do = True
                 self.wait = True
-            elif event.key == pygame.K_DOWN and self.direction != (-1, 0):
+            elif event.key == pygame.K_s and self.direction != (-1, 0):
                 self.direction = (1, 0)
                 self.do = True
                 self.wait = True
-            elif event.key == pygame.K_LEFT and self.direction != (0, 1):
+            elif event.key == pygame.K_a and self.direction != (0, 1):
                 self.direction = (0, -1)
                 self.do = True
                 self.wait = True
-            elif event.key == pygame.K_RIGHT and self.direction != (0, -1):
+            elif event.key == pygame.K_d and self.direction != (0, -1):
                 self.direction = (0, 1)
                 self.do = True
                 self.wait = True
@@ -133,7 +133,7 @@ class Snake(Board):
         return self.ate, message
 
 
-def main(screen):
+def main(screen, clock, width, height, FPS):
     snake = Snake(screen)
     run = True
     while run:
@@ -145,5 +145,5 @@ def main(screen):
         a = snake.update()
         if type(a) == tuple:
             run = False
-            print(a)
-        pygame.time.Clock().tick(5)
+            return a[0] if a[0] else 0
+        clock.tick(5)
