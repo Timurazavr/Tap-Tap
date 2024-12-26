@@ -12,12 +12,22 @@ if __name__ == "__main__":
     pygame.display.set_caption("Tap-Tap")
     clock = pygame.time.Clock()
 
-    txt_version = pygame.font.Font("fonts/bubl.ttf", 40).render(
+    version_font = pygame.font.Font("fonts/bubl.ttf", 40).render(
         "beta, by Timurazavr and Pashok7290", True, "black"
     )
-    txt_name = pygame.font.Font("fonts/bubl.ttf", 200).render("Tap-Tap", True, "black")
+    version_coord = (
+        width - version_font.get_width() - 10,
+        height - version_font.get_height() - 10,
+    )
+    title_font = pygame.font.Font("fonts/bubl.ttf", 200).render(
+        "Tap-Tap", True, "black"
+    )
+    title_coord = (
+        width // 2 - title_font.get_width() // 2,
+        height // 5,
+    )
 
-    start_button = StartButton(width // 2, height // 3 * 2, 500, 150, "red", "Играть")
+    start_button = StartButton(width // 2, height // 3 * 2)
     all_sprites = pygame.sprite.Group()
     all_sprites.add(start_button)
 
@@ -32,7 +42,7 @@ if __name__ == "__main__":
                 quit()
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
-                    if start_button.collide(*event.pos):
+                    if start_button.collidepoint(*event.pos):
                         game_menu.main(screen, clock, width, height, FPS)
 
         all_sprites.update()
@@ -40,20 +50,8 @@ if __name__ == "__main__":
         counter_bg = (counter_bg + 1) % 99
         screen.blit(pygame.image.load(f"video_bg/video_{counter_bg:03}.jpg"), (-200, 0))
 
-        screen.blit(
-            txt_version,
-            (
-                width - txt_version.get_width() - 10,
-                height - txt_version.get_height() - 10,
-            ),
-        )
-        screen.blit(
-            txt_name,
-            (
-                width // 2 - txt_name.get_width() // 2,
-                height // 5,
-            ),
-        )
+        screen.blit(version_font, version_coord)
+        screen.blit(title_font, title_coord)
 
         all_sprites.draw(screen)
 
