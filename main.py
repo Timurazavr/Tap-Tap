@@ -5,9 +5,9 @@ import game_menu
 if __name__ == "__main__":
     pygame.init()
     pygame.mixer.init()
+    FPS = 60
     info = pygame.display.Info()
     width, height = info.current_w, info.current_h
-    FPS = 60
     screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
     pygame.display.set_caption("Tap-Tap")
     clock = pygame.time.Clock()
@@ -16,11 +16,16 @@ if __name__ == "__main__":
         "beta, by Timurazavr and Pashok7290", True, "black"
     )
     txt_name = pygame.font.Font("fonts/bubl.ttf", 200).render("Tap-Tap", True, "black")
+
     start_button = StartButton(width // 2, height // 3 * 2, 500, 150, "red", "Играть")
     all_sprites = pygame.sprite.Group()
     all_sprites.add(start_button)
+
+    counter_bg = -1
+
     while True:
         clock.tick(FPS)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -29,9 +34,12 @@ if __name__ == "__main__":
                 if event.button == 1:
                     if start_button.collide(*event.pos):
                         game_menu.main(screen, clock, width, height, FPS)
+
         all_sprites.update()
 
-        screen.fill("white")
+        counter_bg = (counter_bg + 1) % 99
+        screen.blit(pygame.image.load(f"video_bg/video_{counter_bg:03}.jpg"), (-200, 0))
+
         screen.blit(
             txt_version,
             (
@@ -46,5 +54,7 @@ if __name__ == "__main__":
                 height // 5,
             ),
         )
+
         all_sprites.draw(screen)
+
         pygame.display.flip()

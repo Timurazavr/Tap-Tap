@@ -1,6 +1,4 @@
 import random
-from copy import deepcopy
-
 import pygame
 
 
@@ -21,14 +19,16 @@ class Board:
         self.cell_size = cell_size
 
     def render(self):
-        self.screen.fill((0, 255, 255))
+        self.screen.fill((10, 10, 10))
         z = self.cell_size + 1
         for y in range(len(self.board)):
             for x in range(len(self.board[0])):
                 x1 = self.left + x * z
                 y1 = self.top + y * z
                 if self.board[y][x] == 1:
-                    pygame.draw.rect(self.screen, (0, 255, 0), (x1 + 2, y1 + 2, z - 4, z - 4))
+                    pygame.draw.rect(
+                        self.screen, (0, 255, 0), (x1 + 2, y1 + 2, z - 4, z - 4)
+                    )
                 elif self.board[y][x] == 2:
                     g = (z) / 2
                     pygame.draw.circle(self.screen, (255, 0, 0), (x1 + g, y1 + g), g)
@@ -81,7 +81,7 @@ class Snake(Board):
     def update(self):
         if self.do:
             if len(self.body) == self.width * self.height:
-                return self.end('All field eaten')
+                return self.end("All field eaten")
             last = (self.body[0][0], self.body[0][1])
             g = self.body[0][2]
             self.body[-1] = (self.body[-1][0], self.body[-1][1], self.direction)
@@ -100,9 +100,9 @@ class Snake(Board):
                 if (f[0], f[1]) == (i[0], i[1]):
                     k += 1
             if k > 1:
-                return self.end('Killed by body')
+                return self.end("Killed by body")
             if i[0] > self.height - 1 or i[0] < 0 or i[1] > self.width - 1 or i[1] < 0:
-                return self.end('Killed by field')
+                return self.end("Killed by field")
 
             del i, k, x, y, d
             if (self.body[-1][0], self.body[-1][1]) == self.apple:
@@ -110,9 +110,15 @@ class Snake(Board):
                 self.body.append((last[0], last[1], g))
                 self.body.reverse()
                 t = [(i[0], i[1]) for i in self.body]
-                self.apple = (random.randint(0, self.height - 1), random.randint(0, self.width - 1))
+                self.apple = (
+                    random.randint(0, self.height - 1),
+                    random.randint(0, self.width - 1),
+                )
                 while t.__contains__(self.apple):
-                    self.apple = (random.randint(0, self.height - 1), random.randint(0, self.width - 1))
+                    self.apple = (
+                        random.randint(0, self.height - 1),
+                        random.randint(0, self.width - 1),
+                    )
                 self.ate += 1
                 del t
             self.set_board()
@@ -127,11 +133,8 @@ class Snake(Board):
         return self.ate, message
 
 
-if __name__ == '__main__':
-    # ИСПОЛЬЗОВАНИЕ
-    pygame.init()
-    screen1 = pygame.display.set_mode((562, 500))
-    snake = Snake(screen1)
+def main(screen):
+    snake = Snake(screen)
     run = True
     while run:
         for event in pygame.event.get():

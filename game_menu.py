@@ -1,6 +1,7 @@
 import pygame
 from buttons import Button
 import db
+import Snake
 
 
 class Character(pygame.sprite.Sprite):
@@ -22,9 +23,33 @@ class Character(pygame.sprite.Sprite):
             pass
         return False
 
-    def click(self):
+    def click(self, *args):
         1
         # print("click", self.__class__.__name__)
+
+
+class Mini_game_btn(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = pygame.Surface((50, 50))  # pygame.image.load("male.png")
+        self.image.fill("green")
+        self.rect = self.image.get_rect()
+        self.rect.center = x, y
+        self.text = ""
+
+    def collide(self, x, y):
+        leftx, topy = self.rect.topleft
+        try:
+            if self.rect.collidepoint(x, y) and self.image.get_at(
+                (x - leftx, y - topy)
+            ) != (0, 0, 0, 0):
+                return True
+        except Exception:
+            pass
+        return False
+
+    def click(self, screen):
+        Snake.main(screen)
 
 
 def main(
@@ -34,8 +59,10 @@ def main(
     character = Character(width // 2, height // 2)
     all_sprites.add(character)
     all_sprites.add(Button(50, 750, 300, 100, "red", "назад"))
+    all_sprites.add(Mini_game_btn(1200, 500))
     counter_cash = db.read("cash")
     txt_cash = pygame.font.SysFont("Arial", 48)
+    counter_bg = -1
     running = True
     while running:
         clock.tick(FPS)
@@ -53,10 +80,12 @@ def main(
                                 running = False
                             else:
                                 counter_cash += 1
-                                i.click()
+                                i.click(screen)
 
         all_sprites.update()
-        screen.fill("white")
+        counter_bg = (counter_bg + 1) % 99
+
+        screen.blit(pygame.image.load(f"video_bg/video_{counter_bg:03}.jpg"), (-200, 0))
         all_sprites.draw(screen)
         screen.blit(
             txt_cash.render(str(counter_cash), True, "black"),
