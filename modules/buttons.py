@@ -1,6 +1,5 @@
 import pygame
 from multipledispatch import dispatch
-from typing import overload
 
 
 class StartButton(pygame.sprite.Sprite):
@@ -113,7 +112,7 @@ class Button(pygame.sprite.Sprite):
         try:
             if self.rect.collidepoint(x, y) and self.image.get_at(
                 (x - leftx, y - topy)
-            ) != (255, 255, 255, 255):
+            ) != (255, 255, 255, 0):
                 return True
         except Exception:
             pass

@@ -1,12 +1,14 @@
 import pygame
 import random
-import db
+from modules import db
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, width, height):
+    def __init__(self, width: int, height: int):
         super().__init__()
-        self.image = pygame.transform.scale(pygame.image.load("ship.png"), (150, 100))
+        self.image = pygame.transform.scale(
+            pygame.image.load("textures/ship.png"), (150, 100)
+        )
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.rect.centerx = width / 2
@@ -27,16 +29,18 @@ class Player(pygame.sprite.Sprite):
         if self.rect.left < 0:
             self.rect.left = 0
 
-    def shoot(self, all_sprites, bullets):
+    def shoot(self, all_sprites: pygame.sprite.Group, bullets: pygame.sprite.Group):
         bullet = Bullet(self.rect.centerx, self.rect.top)
         all_sprites.add(bullet)
         bullets.add(bullet)
 
 
 class Asteroid(pygame.sprite.Sprite):
-    def __init__(self, width, height):
+    def __init__(self, width: int, height: int):
         super().__init__()
-        self.image = pygame.transform.scale(pygame.image.load("asteroid.png"), (50, 50))
+        self.image = pygame.transform.scale(
+            pygame.image.load("textures/asteroid.png"), (50, 50)
+        )
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(width - self.rect.width)
@@ -59,7 +63,7 @@ class Asteroid(pygame.sprite.Sprite):
 
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x: int, y: int):
         super().__init__()
         self.image = pygame.Surface((20, 30))
         self.image.fill("yellow")
@@ -90,10 +94,9 @@ def main(screen, clock, width, height, FPS):
 
     hp, counter = db.read("hp"), 0
 
-    hp_image = pygame.transform.scale(pygame.image.load("hp.png"), (40, 40))
+    hp_image = pygame.transform.scale(pygame.image.load("textures/hp.png"), (40, 40))
 
-    running = True
-    while running:
+    while True:
         clock.tick(FPS)
 
         for event in pygame.event.get():
@@ -131,4 +134,3 @@ def main(screen, clock, width, height, FPS):
             screen.blit(hp_image, (10 + i * 50, 10))
 
         pygame.display.flip()
-    return counter

@@ -1,10 +1,27 @@
 import pygame
-from buttons import Button
-from classes import Character
-import db
-import Snake
-import Piu_Piu
-import Runner
+from modules.buttons import Button
+from modules import db, snake_game, piu_piu_game, runner_game
+
+
+class Character(pygame.sprite.Sprite):
+    def __init__(self, x: int, y: int):
+        super().__init__()
+        self.image = pygame.transform.scale(
+            pygame.image.load("textures/male.png"), (450, 480)
+        )
+        self.rect = self.image.get_rect()
+        self.rect.center = x, y
+
+    def collide(self, x, y):
+        leftx, topy = self.rect.topleft
+        try:
+            if self.rect.collidepoint(x, y) and self.image.get_at(
+                (x - leftx, y - topy)
+            ) != (255, 255, 255, 0):
+                return True
+        except Exception:
+            pass
+        return False
 
 
 def main(
@@ -16,19 +33,23 @@ def main(
     all_sprites.add(character)
     down_btn = Button(250, 800, 400, 100, "red", "Назад", "arial", 36)
     all_sprites.add(down_btn)
-    snake = Button(1150, 350, pygame.image.load("snake.png"))
+    snake = Button(1150, 350, pygame.image.load("textures/snake.png"))
     all_sprites.add(snake)
-    snake.click = Snake.main
+    snake.click = snake_game.main
     piu_piu = Button(
-        1150, 500, pygame.transform.scale(pygame.image.load("ship.png"), (92, 92))
+        1150,
+        500,
+        pygame.transform.scale(pygame.image.load("textures/ship.png"), (92, 92)),
     )
     all_sprites.add(piu_piu)
-    piu_piu.click = Piu_Piu.main
+    piu_piu.click = piu_piu_game.main
     runner = Button(
-        1150, 650, pygame.transform.scale(pygame.image.load("runner.png"), (92, 92))
+        1150,
+        650,
+        pygame.transform.scale(pygame.image.load("textures/runner.png"), (92, 92)),
     )
     all_sprites.add(runner)
-    runner.click = Runner.main
+    runner.click = runner_game.main
 
     counter_cash = db.read("cash")
     cash_font = pygame.font.SysFont("Arial", 48)
@@ -38,10 +59,12 @@ def main(
     index_coin = 1
     counter_coin = 0
 
-    surface_coin = pygame.image.load(f"video_coin/star coin rotate {index_coin}.png")
-    hp_image = pygame.image.load("hp.png")
-    damage_image = pygame.image.load("damage.png")
-    speed_image = pygame.image.load("speed.png")
+    surface_coin = pygame.image.load(
+        f"textures/video_coin/star coin rotate {index_coin}.png"
+    )
+    hp_image = pygame.image.load("textures/hp.png")
+    damage_image = pygame.image.load("textures/damage.png")
+    speed_image = pygame.image.load("textures/speed.png")
 
     running = True
     while running:
@@ -75,13 +98,15 @@ def main(
         all_sprites.update()
 
         counter_bg = (counter_bg + 1) % 99
-        screen.blit(pygame.image.load(f"video_bg/video_{counter_bg:03}.jpg"), (-200, 0))
+        screen.blit(
+            pygame.image.load(f"textures/video_bg/video_{counter_bg:03}.jpg"), (-200, 0)
+        )
 
         counter_coin = (counter_coin + 1) % 60
         if not counter_coin % 7:
             index_coin = index_coin % 6 + 1
             surface_coin = pygame.image.load(
-                f"video_coin/star coin rotate {index_coin}.png"
+                f"textures/video_coin/star coin rotate {index_coin}.png"
             )
         surface_cash = cash_font.render(str(counter_cash), True, "white")
         screen.blit(

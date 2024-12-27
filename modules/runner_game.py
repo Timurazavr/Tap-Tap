@@ -1,14 +1,16 @@
 import pygame
-import db
+from modules import db
 import random
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, width, height, image):
+    def __init__(self, width: int, height: int, image: pygame.Surface):
         super().__init__()
         self.image = image
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
-        self.rect.topleft = (0, 0)
+        self.rect.x = 0
+        self.rect.centery = height // 2
         self.speed = db.read("speed")
 
     def update(self):
@@ -23,13 +25,14 @@ class Player(pygame.sprite.Sprite):
 
 
 class Coin(pygame.sprite.Sprite):
-    def __init__(self, width, height, img):
+    def __init__(self, width: int, height: int, image: pygame.Surface):
         super().__init__()
-        self.image = img
+        self.image = image
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(width, width + self.rect.width)
         self.rect.y = random.randrange(0, height - self.rect.height)
-        self.speedx = random.randrange(3, 9)
+        self.speedx = random.randrange(5, 10)
         self.width, self.height = width, height
 
     def update(self):
@@ -41,30 +44,36 @@ class Coin(pygame.sprite.Sprite):
 
 
 def main(screen, clock, width, height, FPS):
-    player_img = pygame.image.load("male.png")
-    coin_img = pygame.image.load("video_coin/star coin rotate 1.png")
+    player_img = pygame.image.load("textures/male.png")
+    coin_img = pygame.image.load("textures/video_coin/star coin rotate 1.png")
 
     all_sprites = pygame.sprite.Group()
-    player = Player(player_img)
+
+    player = Player(width, height, player_img)
     all_sprites.add(player)
+
     coin = Coin(width, height, coin_img)
     all_sprites.add(coin)
-    running = True
-    while running:
+
+    counter = 0
+    while True:
         clock.tick(FPS)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
-
+                pygame.quit()
+                quit()
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                return counter
         all_sprites.update()
-        hits = player.rect.colliderect(coin.rect)
+
+        hits = pygame.sprite.collide_mask(coin, player)
         if hits:
             coin.rect.x = random.randrange(coin.width, coin.width + coin.rect.width)
             coin.rect.y = random.randrange(0, coin.height - coin.rect.height)
             coin.speedx = random.randrange(3, 9)
+            counter += 1
+
         screen.fill((10, 10, 10))
         all_sprites.draw(screen)
         pygame.display.flip()
-
-    return 1

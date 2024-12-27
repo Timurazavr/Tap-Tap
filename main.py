@@ -1,6 +1,6 @@
 import pygame
-from buttons import StartButton
-import game_menu
+from modules.buttons import StartButton
+from modules import game_menu
 
 if __name__ == "__main__":
     pygame.init()
@@ -12,14 +12,14 @@ if __name__ == "__main__":
     pygame.display.set_caption("Tap-Tap")
     clock = pygame.time.Clock()
 
-    version_font = pygame.font.Font("fonts/bubl.ttf", 40).render(
+    version_font = pygame.font.Font("textures/fonts/bubl.ttf", 40).render(
         "beta, by Timurazavr and Pashok7290", True, "black"
     )
     version_coord = (
         width - version_font.get_width() - 10,
         height - version_font.get_height() - 10,
     )
-    title_font = pygame.font.Font("fonts/bubl.ttf", 200).render(
+    title_font = pygame.font.Font("textures/fonts/bubl.ttf", 200).render(
         "Tap-Tap", True, "black"
     )
     title_coord = (
@@ -48,7 +48,9 @@ if __name__ == "__main__":
         all_sprites.update()
 
         counter_bg = (counter_bg + 1) % 99
-        screen.blit(pygame.image.load(f"video_bg/video_{counter_bg:03}.jpg"), (-200, 0))
+        screen.blit(
+            pygame.image.load(f"textures/video_bg/video_{counter_bg:03}.jpg"), (-200, 0)
+        )
 
         screen.blit(version_font, version_coord)
         screen.blit(title_font, title_coord)

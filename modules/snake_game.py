@@ -135,15 +135,14 @@ class Snake(Board):
 
 def main(screen, clock, width, height, FPS):
     snake = Snake(screen)
-    run = True
-    while run:
+    while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False
+                pygame.quit()
+                quit()
             if event.type == pygame.KEYDOWN:
                 snake.change_direction(event)
         a = snake.update()
         if type(a) == tuple:
-            run = False
             return a[0] if a[0] else 0
         clock.tick(5)
