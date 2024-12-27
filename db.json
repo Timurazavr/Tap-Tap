@@ -1,1 +1,6 @@
-{"cash": 314, "hp": 1, "damage": 1, "speed": 1}
+{
+    "cash": 0,
+    "hp": 1,
+    "damage": 1,
+    "speed": 1
+}

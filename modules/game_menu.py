@@ -28,11 +28,25 @@ def main(
     screen: pygame.Surface, clock: pygame.Clock, width: int, height: int, FPS: int
 ):
     all_sprites = pygame.sprite.Group()
+    db_dict = db.all_read()
 
     character = Character(width // 2, height // 2)
     all_sprites.add(character)
     down_btn = Button(250, 800, 400, 100, "red", "Назад", "arial", 36)
     all_sprites.add(down_btn)
+    damage_btn = Button(
+        400, 215, 250, 100, "red", f"-{db_dict['damage']**2 * 100}", "arial", 56
+    )
+    all_sprites.add(damage_btn)
+    if db_dict["hp"] != 3:
+        hp_btn = Button(
+            400, 415, 250, 100, "red", f"-{db_dict['hp'] * 1000}", "arial", 56
+        )
+        all_sprites.add(hp_btn)
+    speed_btn = Button(
+        400, 615, 250, 100, "red", f"-{db_dict['speed']**2 * 50}", "arial", 56
+    )
+    all_sprites.add(speed_btn)
     snake = Button(1150, 350, pygame.image.load("textures/snake.png"))
     all_sprites.add(snake)
     snake.click = snake_game.main
@@ -51,8 +65,7 @@ def main(
     all_sprites.add(runner)
     runner.click = runner_game.main
 
-    counter_cash = db.read("cash")
-    cash_font = pygame.font.SysFont("Arial", 48)
+    text_font = pygame.font.SysFont("Arial", 48)
     game_font = pygame.font.SysFont("Arial", 56)
 
     counter_bg = -1
@@ -72,28 +85,87 @@ def main(
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                db.write("cash", counter_cash, "write")
+                db.all_write(db_dict)
                 pygame.quit()
                 quit()
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     if character.collide(*event.pos):
-                        counter_cash += 1
+                        db_dict["cash"] += 1
                     elif down_btn.collide(*event.pos):
-                        db.write("cash", counter_cash, "write")
+                        db.all_write(db_dict)
                         running = False
                     elif snake.collide(*event.pos):
-                        counter_cash += snake.click(
-                            screen, clock, width, height, FPS
-                        ) * db.read("damage")
+                        db_dict["cash"] += (
+                            snake.click(screen, clock, width, height, FPS)
+                            * db_dict["damage"]
+                        )
                     elif piu_piu.collide(*event.pos):
-                        counter_cash += piu_piu.click(
-                            screen, clock, width, height, FPS
-                        ) * db.read("damage")
+                        db_dict["cash"] += (
+                            piu_piu.click(screen, clock, width, height, FPS)
+                            * db_dict["damage"]
+                        )
                     elif runner.collide(*event.pos):
-                        counter_cash += runner.click(
-                            screen, clock, width, height, FPS
-                        ) * db.read("damage")
+                        db_dict["cash"] += (
+                            runner.click(screen, clock, width, height, FPS)
+                            * db_dict["damage"]
+                        )
+                    elif (
+                        damage_btn.collide(*event.pos)
+                        and db_dict["damage"] ** 2 * 100 <= db_dict["cash"]
+                    ):
+                        db_dict["cash"] -= db_dict["damage"] ** 2 * 100
+                        db_dict["damage"] += 1
+                        all_sprites.remove(damage_btn)
+                        damage_btn = Button(
+                            400,
+                            215,
+                            250,
+                            100,
+                            "red",
+                            f"-{db_dict['damage']**2 * 100}",
+                            "arial",
+                            56,
+                        )
+                        all_sprites.add(damage_btn)
+                    elif (
+                        db_dict["hp"] != 3
+                        and hp_btn.collide(*event.pos)
+                        and db_dict["hp"] * 1000 <= db_dict["cash"]
+                    ):
+                        db_dict["cash"] -= db_dict["hp"] * 1000
+                        db_dict["hp"] += 1
+                        all_sprites.remove(hp_btn)
+                        if db_dict["hp"] != 3:
+                            hp_btn = Button(
+                                400,
+                                415,
+                                250,
+                                100,
+                                "red",
+                                f"-{db_dict['hp'] * 1000}",
+                                "arial",
+                                56,
+                            )
+                            all_sprites.add(hp_btn)
+                    elif (
+                        speed_btn.collide(*event.pos)
+                        and db_dict["speed"] ** 2 * 50 <= db_dict["cash"]
+                    ):
+                        db_dict["cash"] -= db_dict["speed"] ** 2 * 50
+                        db_dict["speed"] += 1
+                        all_sprites.remove(speed_btn)
+                        speed_btn = Button(
+                            400,
+                            615,
+                            250,
+                            100,
+                            "red",
+                            f"-{db_dict['speed']**2 * 50}",
+                            "arial",
+                            56,
+                        )
+                        all_sprites.add(speed_btn)
 
         all_sprites.update()
 
@@ -108,14 +180,14 @@ def main(
             surface_coin = pygame.image.load(
                 f"textures/video_coin/star coin rotate {index_coin}.png"
             )
-        surface_cash = cash_font.render(str(counter_cash), True, "white")
+        surface_cash = text_font.render(str(db_dict["cash"]), True, "white")
         screen.blit(
             surface_cash,
             (250, 23),
         )
         screen.blit(
             surface_coin,
-            (200, 25),
+            (200 - surface_coin.width // 2, 25),
         )
         screen.blit(
             game_font.render("Мини-игры:", True, "white"),
@@ -126,12 +198,24 @@ def main(
             (50, 150),
         )
         screen.blit(
+            text_font.render(str(db_dict["damage"]), True, "white"),
+            (175, 180),
+        )
+        screen.blit(
             hp_image,
             (50, 350),
         )
         screen.blit(
+            text_font.render(str(db_dict["hp"]), True, "white"),
+            (175, 380),
+        )
+        screen.blit(
             speed_image,
             (50, 550),
+        )
+        screen.blit(
+            text_font.render(str(db_dict["speed"]), True, "white"),
+            (175, 580),
         )
 
         all_sprites.draw(screen)
