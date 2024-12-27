@@ -86,8 +86,7 @@ def main(
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 db.all_write(db_dict)
-                pygame.quit()
-                quit()
+                running = False
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     if character.collide(*event.pos):

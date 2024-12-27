@@ -1,6 +1,7 @@
 import pygame
 from modules.buttons import StartButton
 from modules import game_menu
+import sys
 
 if __name__ == "__main__":
     pygame.init()
@@ -32,14 +33,13 @@ if __name__ == "__main__":
     all_sprites.add(start_button)
 
     counter_bg = -1
-
-    while True:
+    running = True
+    while running:
         clock.tick(FPS)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
+                running = False
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     if start_button.collidepoint(*event.pos):
@@ -58,3 +58,4 @@ if __name__ == "__main__":
         all_sprites.draw(screen)
 
         pygame.display.flip()
+pygame.quit()

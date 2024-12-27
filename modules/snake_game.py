@@ -138,8 +138,7 @@ def main(screen, clock, width, height, FPS):
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
+                return 0
             if event.type == pygame.KEYDOWN:
                 snake.change_direction(event)
         a = snake.update()

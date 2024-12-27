@@ -95,14 +95,12 @@ def main(screen, clock, width, height, FPS):
     hp, counter = db.read("hp"), 0
 
     hp_image = pygame.transform.scale(pygame.image.load("textures/hp.png"), (40, 40))
-
     while True:
         clock.tick(FPS)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
+                return counter
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_w:
                     player.shoot(all_sprites, shots)

@@ -61,8 +61,7 @@ def main(screen, clock, width, height, FPS):
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
+                return counter
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 return counter
         all_sprites.update()
