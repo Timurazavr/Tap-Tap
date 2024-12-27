@@ -4,7 +4,7 @@ import pygame
 class Character(pygame.sprite.Sprite):
     def __init__(self, x: int, y: int):
         super().__init__()
-        self.image = pygame.image.load("male.png")
+        self.image = pygame.transform.scale(pygame.image.load("male.png"), (450, 480))
         self.rect = self.image.get_rect()
         self.rect.center = x, y
 

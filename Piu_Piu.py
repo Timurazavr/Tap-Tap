@@ -1,11 +1,13 @@
 import pygame
 import random
+import db
 
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, width, height):
         super().__init__()
         self.image = pygame.transform.scale(pygame.image.load("ship.png"), (150, 100))
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.rect.centerx = width / 2
         self.rect.bottom = height - 10
@@ -34,8 +36,8 @@ class Player(pygame.sprite.Sprite):
 class Asteroid(pygame.sprite.Sprite):
     def __init__(self, width, height):
         super().__init__()
-        self.image = pygame.Surface((50, 50))
-        self.image.fill("red")
+        self.image = pygame.transform.scale(pygame.image.load("asteroid.png"), (50, 50))
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(width - self.rect.width)
         self.rect.y = random.randrange(-100, -40)
@@ -59,8 +61,9 @@ class Asteroid(pygame.sprite.Sprite):
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.Surface((10, 30))
+        self.image = pygame.Surface((20, 30))
         self.image.fill("yellow")
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.rect.bottom = y
         self.rect.centerx = x
@@ -76,39 +79,56 @@ def main(screen, clock, width, height, FPS):
     all_sprites = pygame.sprite.Group()
     asteroids = pygame.sprite.Group()
     shots = pygame.sprite.Group()
+
     player = Player(width, height)
     all_sprites.add(player)
+
     for _ in range(10):
         m = Asteroid(width, height)
         all_sprites.add(m)
         asteroids.add(m)
 
-    counter = 0
+    hp, counter = db.read("hp"), 0
+
+    hp_image = pygame.transform.scale(pygame.image.load("hp.png"), (40, 40))
+
     running = True
     while running:
         clock.tick(FPS)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                pygame.quit()
+                quit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_w:
                     player.shoot(all_sprites, shots)
 
         all_sprites.update()
 
-        hits = pygame.sprite.groupcollide(asteroids, shots, True, True)
+        hits = pygame.sprite.groupcollide(
+            asteroids, shots, True, True, pygame.sprite.collide_mask
+        )
         for _ in hits:
             m = Asteroid(width, height)
             all_sprites.add(m)
             asteroids.add(m)
             counter += 1
 
-        hits = pygame.sprite.spritecollide(player, asteroids, False)
+        hits = pygame.sprite.spritecollide(
+            player, asteroids, True, pygame.sprite.collide_mask
+        )
         if hits:
-            return counter
+            hp -= 1
+            if hp == 0:
+                return counter
 
-        screen.fill("black")
+        screen.fill((10, 10, 10))
+
         all_sprites.draw(screen)
 
+        for i in range(hp):
+            screen.blit(hp_image, (10 + i * 50, 10))
+
         pygame.display.flip()
+    return counter

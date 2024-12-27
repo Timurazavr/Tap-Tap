@@ -4,6 +4,7 @@ from classes import Character
 import db
 import Snake
 import Piu_Piu
+import Runner
 
 
 def main(
@@ -23,6 +24,11 @@ def main(
     )
     all_sprites.add(piu_piu)
     piu_piu.click = Piu_Piu.main
+    runner = Button(
+        1150, 650, pygame.transform.scale(pygame.image.load("runner.png"), (92, 92))
+    )
+    all_sprites.add(runner)
+    runner.click = Runner.main
 
     counter_cash = db.read("cash")
     cash_font = pygame.font.SysFont("Arial", 48)
@@ -31,7 +37,11 @@ def main(
     counter_bg = -1
     index_coin = 1
     counter_coin = 0
+
     surface_coin = pygame.image.load(f"video_coin/star coin rotate {index_coin}.png")
+    hp_image = pygame.image.load("hp.png")
+    damage_image = pygame.image.load("damage.png")
+    speed_image = pygame.image.load("speed.png")
 
     running = True
     while running:
@@ -50,11 +60,17 @@ def main(
                         db.write("cash", counter_cash, "write")
                         running = False
                     elif snake.collide(*event.pos):
-                        counter_cash += (
-                            snake.click(screen, clock, width, height, FPS) * 3
-                        )
+                        counter_cash += snake.click(
+                            screen, clock, width, height, FPS
+                        ) * db.read("damage")
                     elif piu_piu.collide(*event.pos):
-                        counter_cash += piu_piu.click(screen, clock, width, height, FPS)
+                        counter_cash += piu_piu.click(
+                            screen, clock, width, height, FPS
+                        ) * db.read("damage")
+                    elif runner.collide(*event.pos):
+                        counter_cash += runner.click(
+                            screen, clock, width, height, FPS
+                        ) * db.read("damage")
 
         all_sprites.update()
 
@@ -70,15 +86,27 @@ def main(
         surface_cash = cash_font.render(str(counter_cash), True, "white")
         screen.blit(
             surface_cash,
-            (width - 200 - surface_cash.width, 23),
+            (250, 23),
         )
         screen.blit(
             surface_coin,
-            (width - 260 - surface_cash.width - surface_coin.width // 2, 25),
+            (200, 25),
         )
         screen.blit(
             game_font.render("Мини-игры:", True, "white"),
             (1050, 200),
+        )
+        screen.blit(
+            damage_image,
+            (50, 150),
+        )
+        screen.blit(
+            hp_image,
+            (50, 350),
+        )
+        screen.blit(
+            speed_image,
+            (50, 550),
         )
 
         all_sprites.draw(screen)
