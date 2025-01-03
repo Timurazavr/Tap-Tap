@@ -1,7 +1,7 @@
 import pygame
 from modules.buttons import StartButton
 from modules import game_menu
-import sys
+
 
 if __name__ == "__main__":
     pygame.init()
